@@ -1,4 +1,3 @@
-// Setting up our dependencies
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
@@ -6,36 +5,36 @@ var logger = require('morgan');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 mongoose.Promise = require('bluebird');
-mongoose.connect('mongodb://localhost/mern-crud', { promiseLibrary: require('bluebird') })
+mongoose.connect('mongodb://localhost/mern-crud', { useMongoClient: true, promiseLibrary: require('bluebird') })
   .then(() =>  console.log('connection succesful'))
   .catch((err) => console.error(err));
 
-var recept = require('./routes/recept');
+var book = require('./routes/book');
 var app = express();
 
 app.use(logger('dev'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({'extended': 'false'}));
+app.use(bodyParser.urlencoded({'extended':'false'}));
 app.use(express.static(path.join(__dirname, 'build')));
 
-app.use('/api/recept', recept);
+app.use('/api/book', book);
 
-// Catching 404 error
+// catch 404 and forward to error handler
 app.use(function(req, res, next) {
   var err = new Error('Not Found');
   err.status = 404;
   next(err);
 });
 
-// Error handler
+// error handler
 app.use(function(err, req, res, next) {
-  // Set locals, ony providing errors during development
+  // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
 
-  // Rendering the error page
-  res.status(err.status||500);
-  res.json({message:err.message,error:err});
+  // render the error page
+  res.status(err.status || 500);
+  res.render('error');
 });
 
 module.exports = app;
